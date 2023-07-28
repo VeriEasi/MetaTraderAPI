@@ -7,9 +7,9 @@ using System.ServiceModel.Channels;
 using System.Net.Sockets;
 using log4net;
 
-namespace MTApiService
+namespace MTAPIService
 {
-    internal class MtServer : IDisposable, IMtApiServer
+    internal class MTServer : IDisposable, IMTAPIServer
     {
         #region Constants
         private const int WaitResponseTime = 40000; // 40 sec
@@ -17,19 +17,19 @@ namespace MTApiService
         #endregion
 
         #region Fields
-        private static readonly ILog Log = LogManager.GetLogger(typeof(MtServer));
+        private static readonly ILog Log = LogManager.GetLogger(typeof(MTServer));
 
-        private readonly MtService _service;
+        private readonly MTService _service;
         private readonly List<ServiceHost> _hosts = new List<ServiceHost>();
-        private readonly MtExecutorManager _executorManager = new MtExecutorManager();
-        private readonly List<MtExpert> _experts = new List<MtExpert>();
+        private readonly MTExecutorManager _executorManager = new MTExecutorManager();
+        private readonly List<MTExpert> _experts = new List<MTExpert>();
         #endregion
 
         #region ctor
-        public MtServer(int port)
+        public MTServer(int port)
         {
             Port = port;
-            _service = new MtService(this);
+            _service = new MTService(this);
         }
         #endregion
 
@@ -119,7 +119,7 @@ namespace MTApiService
                 serviceHost = new ServiceHost(_service);
                 var binding = CreateConnectionBinding(local);
 
-                serviceHost.AddServiceEndpoint(typeof(IMtApi), binding, serverUrlAdress);
+                serviceHost.AddServiceEndpoint(typeof(IMTAPI), binding, serverUrlAdress);
                 serviceHost.Open();
             }
             catch(Exception e) 
@@ -133,7 +133,7 @@ namespace MTApiService
             return serviceHost;
         }
 
-        public void AddExpert(MtExpert expert)
+        public void AddExpert(MTExpert expert)
         {
             Log.DebugFormat("AddExpert: begin. expert {0}", expert);
 
@@ -143,9 +143,9 @@ namespace MTApiService
                 return;
             }
 
-            expert.Deinited += expert_Deinited;
-            expert.QuoteChanged += expert_QuoteChanged;
-            expert.OnMtEvent += Expert_OnMtEvent;
+            expert.Deinited += ExpertDeinited;
+            expert.QuoteChanged += ExpertQuoteChanged;
+            expert.OnMtEvent += ExpertOnMTEvent;
 
             lock (_experts)
             {
@@ -161,9 +161,9 @@ namespace MTApiService
 
         #endregion
 
-        #region IMtApiServerCallback Members
+        #region IMTAPIServerCallback Members
 
-        public MtResponse SendCommand(MtCommand command)
+        public MTResponse SendCommand(MTCommand command)
         {
             Log.DebugFormat("SendCommand: begin. command {0}", command);
 
@@ -176,7 +176,7 @@ namespace MTApiService
             var task = _executorManager.SendCommand(command);
 
             //wait for execute command in MetaTrader
-            MtResponse response = null;
+            MTResponse response = null;
             try
             {
                 response = task.WaitResult(WaitResponseTime);
@@ -191,7 +191,7 @@ namespace MTApiService
             return response;
         }
 
-        public List<MtQuote> GetQuotes()
+        public List<MTQuote> GetQuotes()
         {
             Log.Debug("GetQuotes: called");
 
@@ -204,9 +204,9 @@ namespace MTApiService
         #endregion
 
         #region Private Methods
-        private void stopTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        private void StopTimerElapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            Log.DebugFormat("stopTimer_Elapsed: begin");
+            Log.DebugFormat("StopTimerElapsed: begin");
 
             int expertsCount;
 
@@ -224,11 +224,10 @@ namespace MTApiService
                 Stop();
             }
 
-            var stopTimer = sender as System.Timers.Timer;
-            if (stopTimer == null) return;
+            if (!(sender is System.Timers.Timer stopTimer)) return;
 
             stopTimer.Stop();
-            stopTimer.Elapsed -= stopTimer_Elapsed;
+            stopTimer.Elapsed -= StopTimerElapsed;
 
             Log.DebugFormat("stopTimer_Elapsed: end");
         }
@@ -364,14 +363,13 @@ namespace MTApiService
             Log.Debug("Stop: end.");
         }
 
-        private void expert_Deinited(object sender, EventArgs e)
+        private void ExpertDeinited(object sender, EventArgs e)
         {
             Log.Debug("expert_Deinited: begin.");
 
-            var expert = sender as MtExpert;
-            if (expert == null)
+            if (!(sender is MTExpert expert))
             {
-                Log.Warn("expert_Deinited: end. Expert is not defined.");
+                Log.Warn("ExpertDeinited: end. Expert is not defined.");
                 return;
             }
 
@@ -385,38 +383,38 @@ namespace MTApiService
 
             _executorManager.RemoveExecutor(expert);
 
-            expert.Deinited -= expert_Deinited;
-            expert.QuoteChanged -= expert_QuoteChanged;
+            expert.Deinited -= ExpertDeinited;
+            expert.QuoteChanged -= ExpertQuoteChanged;
 
             _service.OnQuoteRemoved(expert.Quote);
 
             if (expertsCount == 0)
             {
                 var stopTimer = new System.Timers.Timer();
-                stopTimer.Elapsed += stopTimer_Elapsed;
+                stopTimer.Elapsed += StopTimerElapsed;
                 stopTimer.Interval = StopExpertInterval;
                 stopTimer.Start();
             }
 
-            Log.Debug("expert_Deinited: end.");
+            Log.Debug("ExpertDeinited: end.");
         }
 
-        private void expert_QuoteChanged(MtExpert expert, MtQuote quote)
+        private void ExpertQuoteChanged(MTExpert expert, MTQuote quote)
         {
-            Log.DebugFormat("expert_QuoteChanged: begin. expert = {0}, quote = {1}", expert, quote);
+            Log.DebugFormat("ExpertQuoteChanged: begin. expert = {0}, quote = {1}", expert, quote);
 
             _service.QuoteUpdate(quote);
 
-            Log.Debug("expert_QuoteChanged: end.");
+            Log.Debug("ExpertQuoteChanged: end.");
         }
 
-        private void Expert_OnMtEvent(MtExpert expert, MtEvent e)
+        private void ExpertOnMTEvent(MTExpert expert, MTEvent e)
         {
-            Log.DebugFormat("Expert_OnMtEvent: begin. expert = {0}, event = {1}", expert, e);
+            Log.DebugFormat("ExpertOnMtEvent: begin. expert = {0}, event = {1}", expert, e);
 
             _service.OnMtEvent(e);
 
-            Log.Debug("Expert_OnMtEvent: end.");
+            Log.Debug("ExpertOnMtEvent: end.");
         }
 
         private void FireOnStopped()

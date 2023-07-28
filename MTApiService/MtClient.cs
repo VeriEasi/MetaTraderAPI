@@ -4,24 +4,24 @@ using System.ServiceModel;
 using System.Collections.Generic;
 using log4net;
 
-namespace MTApiService
+namespace MTAPIService
 {
     [CallbackBehavior(ConcurrencyMode = ConcurrencyMode.Multiple, UseSynchronizationContext = false)]
-    public class MtClient : IMtApiCallback, IDisposable
+    public class MTClient : IMTAPICallback, IDisposable
     {
-        private const string ServiceName = "MtApiService";
+        private const string ServiceName = "MTAPIService";
 
-        public delegate void MtQuoteHandler(MtQuote quote);
-        public delegate void MtEventHandler(MtEvent e);
+        public delegate void MTQuoteHandler(MTQuote quote);
+        public delegate void MTEventHandler(MTEvent e);
 
         #region Fields
-        private static readonly ILog Log = LogManager.GetLogger(typeof(MtClient));
+        private static readonly ILog Log = LogManager.GetLogger(typeof(MTClient));
 
-        private readonly MtApiProxy _proxy;
+        private readonly MTAPIProxy _proxy;
         #endregion
 
         #region ctor
-        public MtClient(string host, int port)
+        public MTClient(string host, int port)
         {
             if (string.IsNullOrEmpty(host))
                 throw new ArgumentNullException(nameof(host), "host is null or empty");
@@ -51,11 +51,11 @@ namespace MTApiService
                 }
             };
 
-            _proxy = new MtApiProxy(new InstanceContext(this), bind, new EndpointAddress(urlService));
+            _proxy = new MTAPIProxy(new InstanceContext(this), bind, new EndpointAddress(urlService));
             _proxy.Faulted += ProxyFaulted;
         }
 
-        public MtClient(int port)
+        public MTClient(int port)
         {
             if (port < 0 || port > 65536)
                 throw new ArgumentOutOfRangeException(nameof(port), "port value is invalid");
@@ -81,7 +81,7 @@ namespace MTApiService
                 }
             };
 
-            _proxy = new MtApiProxy(new InstanceContext(this), bind, new EndpointAddress(urlService));
+            _proxy = new MTAPIProxy(new InstanceContext(this), bind, new EndpointAddress(urlService));
             _proxy.Faulted += ProxyFaulted;
         }
 
@@ -139,7 +139,7 @@ namespace MTApiService
         }
 
         /// <exception cref="CommunicationException">Thrown when connection failed</exception>
-        public MtResponse SendCommand(int commandType, ArrayList parameters, Dictionary<string, object> namedParams, int expertHandle)
+        public MTResponse SendCommand(int commandType, ArrayList parameters, Dictionary<string, object> namedParams, int expertHandle)
         {
             Log.DebugFormat("SendCommand: begin. commandType = {0}, parameters count = {1}", commandType, parameters?.Count);
 
@@ -149,11 +149,11 @@ namespace MTApiService
                 throw new CommunicationException("Client is not connected.");
             }
 
-            MtResponse result;
+            MTResponse result;
 
             try
             {
-                result = _proxy.SendCommand(new MtCommand {
+                result = _proxy.SendCommand(new MTCommand {
                     CommandType = commandType,
                     Parameters = parameters,
                     NamedParams = namedParams,
@@ -172,7 +172,7 @@ namespace MTApiService
         }
 
         /// <exception cref="CommunicationException">Thrown when connection failed</exception>
-        public List<MtQuote> GetQuotes()
+        public List<MTQuote> GetQuotes()
         {
             Log.Debug("GetQuotes: begin.");
 
@@ -182,7 +182,7 @@ namespace MTApiService
                 return null;
             }
 
-            List<MtQuote> result;
+            List<MTQuote> result;
 
             try
             {
@@ -204,7 +204,7 @@ namespace MTApiService
 
         #region IMtApiCallback Members
 
-        public void OnQuoteUpdate(MtQuote quote)
+        public void OnQuoteUpdate(MTQuote quote)
         {
             Log.DebugFormat("OnQuoteUpdate: begin. quote = {0}", quote);
 
@@ -215,7 +215,7 @@ namespace MTApiService
             Log.Debug("OnQuoteUpdate: end.");
         }
 
-        public void OnQuoteAdded(MtQuote quote)
+        public void OnQuoteAdded(MTQuote quote)
         {
             Log.DebugFormat("OnQuoteAdded: begin. quote = {0}", quote);
 
@@ -224,7 +224,7 @@ namespace MTApiService
             Log.Debug("OnQuoteAdded: end.");
         }
 
-        public void OnQuoteRemoved(MtQuote quote)
+        public void OnQuoteRemoved(MTQuote quote)
         {
             Log.DebugFormat("OnQuoteRemoved: begin. quote = {0}", quote);
 
@@ -243,7 +243,7 @@ namespace MTApiService
         }
 
 
-        public void OnMtEvent(MtEvent e)
+        public void OnMtEvent(MTEvent e)
         {
             Log.DebugFormat("OnMtEvent: begin. event = {0}", e);
 
@@ -289,12 +289,12 @@ namespace MTApiService
         #endregion
 
         #region Events
-        public event MtQuoteHandler QuoteAdded;
-        public event MtQuoteHandler QuoteRemoved;
-        public event MtQuoteHandler QuoteUpdated;
+        public event MTQuoteHandler QuoteAdded;
+        public event MTQuoteHandler QuoteRemoved;
+        public event MTQuoteHandler QuoteUpdated;
         public event EventHandler ServerDisconnected;
         public event EventHandler ServerFailed;
-        public event MtEventHandler MtEventReceived;
+        public event MTEventHandler MtEventReceived;
         #endregion
     }
 }

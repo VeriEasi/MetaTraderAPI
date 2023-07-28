@@ -3,29 +3,29 @@ using System.Collections.Generic;
 using Microsoft.Win32;
 using System.Diagnostics;
 
-namespace MTApiService
+namespace MTAPIService
 {
-    public class MtRegistryManager
+    public class MTRegistryManager
     {
         private const string Software = "Software";
-        private const string AppName = "MtApi";
+        private const string AppName = "MTAPI";
         private const string ProfilesRegkey = "ConnectionProfiles";
         private const string HostRegvalueName = "Host";
         private const string PortRegvalueName = "Port";
         private const string SignatureRegvalueName = "MtSignature";
 
         #region Public Methods
-        public static IEnumerable<MtConnectionProfile> LoadConnectionProfiles()
+        public static IEnumerable<MTConnectionProfile> LoadConnectionProfiles()
         {
             return LoadConnectionProfilesFromRegisty();
         }
 
-        public static MtConnectionProfile LoadConnectionProfile(string profileName)
+        public static MTConnectionProfile LoadConnectionProfile(string profileName)
         {
             return string.IsNullOrEmpty(profileName) == false ? LoadConnectionProfileFromRegisty(profileName) : null;
         }
 
-        public static void AddConnectionProfile(MtConnectionProfile profile)
+        public static void AddConnectionProfile(MTConnectionProfile profile)
         {            
             if (profile != null && string.IsNullOrEmpty(profile.Name) == false)
             {
@@ -167,9 +167,9 @@ namespace MTApiService
         #endregion
 
         #region Private Methods
-        private static IEnumerable<MtConnectionProfile> LoadConnectionProfilesFromRegisty()
+        private static IEnumerable<MTConnectionProfile> LoadConnectionProfilesFromRegisty()
         {
-            List<MtConnectionProfile> profiles = null;
+            List<MTConnectionProfile> profiles = null;
 
             var softwareRegKey = Registry.CurrentUser.OpenSubKey(Software, true);
             if (softwareRegKey != null)
@@ -186,7 +186,7 @@ namespace MTApiService
                             {
                                 using (profilesRegKey)
                                 {
-                                    profiles = new List<MtConnectionProfile>();
+                                    profiles = new List<MTConnectionProfile>();
 
                                     foreach (var profileNameKey in profilesRegKey.GetSubKeyNames())
                                     {
@@ -195,7 +195,7 @@ namespace MTApiService
                                         {
                                             using (tempKey)
                                             {
-                                                var profile = new MtConnectionProfile(profileNameKey)
+                                                var profile = new MTConnectionProfile(profileNameKey)
                                                 {
                                                     Host = tempKey.GetValue(HostRegvalueName).ToString(),
                                                     Port = (int) tempKey.GetValue(PortRegvalueName)
@@ -215,9 +215,9 @@ namespace MTApiService
             return profiles;
         }
 
-        private static MtConnectionProfile LoadConnectionProfileFromRegisty(string profileName)
+        private static MTConnectionProfile LoadConnectionProfileFromRegisty(string profileName)
         {
-            MtConnectionProfile profile = null;
+            MTConnectionProfile profile = null;
 
             var softwareRegKey = Registry.CurrentUser.OpenSubKey(Software, true);
             if (softwareRegKey != null)
@@ -239,7 +239,7 @@ namespace MTApiService
                                     {
                                         using (tempKey)
                                         {
-                                            profile = new MtConnectionProfile(profileName)
+                                            profile = new MTConnectionProfile(profileName)
                                             {
                                                 Host = tempKey.GetValue(HostRegvalueName).ToString(),
                                                 Port = (int) tempKey.GetValue(PortRegvalueName)
@@ -257,7 +257,7 @@ namespace MTApiService
             return profile;
         }
 
-        private static void SaveConnectionProfileToRegistry(MtConnectionProfile profile)
+        private static void SaveConnectionProfileToRegistry(MTConnectionProfile profile)
         {
             var softwareRgKey = Registry.CurrentUser.OpenSubKey(Software, true);
 

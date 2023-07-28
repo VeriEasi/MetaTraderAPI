@@ -6,12 +6,12 @@ using log4net.Core;
 using log4net.Layout;
 using log4net.Repository.Hierarchy;
 
-namespace MTApiService
+namespace MTAPIService
 {
-    public class MtLog
+    public class MTLog
     {
         #region ctor
-        internal MtLog(Type type)
+        internal MTLog(Type type)
         {
             _log = LogManager.GetLogger(type);
         }
@@ -109,12 +109,12 @@ namespace MTApiService
             hierarchy.Configured = true;
         }
 
-        public static MtLog GetLogger(Type type)
+        public static MTLog GetLogger(Type type)
         {
             if (type == null)
                 throw new ArgumentNullException(nameof(type));
 
-            return new MtLog(type);
+            return new MTLog(type);
         }
 
         private static Level ConvertLogLevel(LogLevel logLevel)

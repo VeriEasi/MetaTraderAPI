@@ -4,7 +4,7 @@
 
 #include <Windows.h>
 
-using namespace MTApiService;
+using namespace MTAPIService;
 
 ref class MT5Handler: IMetaTraderHandler
 {

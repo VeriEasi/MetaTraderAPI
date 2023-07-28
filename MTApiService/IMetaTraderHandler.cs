@@ -1,4 +1,4 @@
-﻿namespace MTApiService
+﻿namespace MTAPIService
 {
     public interface IMetaTraderHandler
     {

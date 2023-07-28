@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 
-namespace MTApiService
+namespace MTAPIService
 {
-    public interface IMtApiServer
+    public interface IMTAPIServer
     {
-        MtResponse SendCommand(MtCommand command);
-        List<MtQuote> GetQuotes();
+        MTResponse SendCommand(MTCommand command);
+        List<MTQuote> GetQuotes();
     }
 }

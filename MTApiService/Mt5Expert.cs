@@ -1,15 +1,15 @@
 ﻿using log4net;
 
-namespace MTApiService
+namespace MTAPIService
 {
-    public class Mt5Expert : MtExpert
+    public class MT5Expert : MTExpert
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(Mt5Expert));
+        private static readonly ILog Log = LogManager.GetLogger(typeof(MT5Expert));
         private const int StopExpertInterval = 2000; // 2 sec for testing mode
         private System.Timers.Timer _stopTimer;
 
 
-        public Mt5Expert(int handle, string symbol, double bid, double ask, IMetaTraderHandler mtHandler, bool isTestMode) : 
+        public MT5Expert(int handle, string symbol, double bid, double ask, IMetaTraderHandler mtHandler, bool isTestMode) : 
             base(handle, symbol, bid, ask, mtHandler)
         {
             IsTestMode = isTestMode;
@@ -29,7 +29,7 @@ namespace MTApiService
             return base.GetCommandType();
         }
 
-        public override void SendEvent(MtEvent mtEvent)
+        public override void SendEvent(MTEvent mtEvent)
         {
             Log.DebugFormat("SendEvent: begin. event = {0}", mtEvent);
 
@@ -42,7 +42,7 @@ namespace MTApiService
                         Interval = StopExpertInterval,
                         AutoReset = false
                     };
-                    _stopTimer.Elapsed += _stopTimer_Elapsed;
+                    _stopTimer.Elapsed += StopTimerElapsed;
                 }
             }
 
@@ -51,14 +51,14 @@ namespace MTApiService
             Log.Debug("SendEvent: end.");
         }
 
-        private void _stopTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        private void StopTimerElapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
             Log.Debug("_stopTimer_Elapsed: begin.");
 
-            Log.Warn("Mt5Expert has received new tick during 2 sec in testing mode. The possible cause: user has stopped the tester manually in MetaTrader 5.");
+            Log.Warn("MT5Expert has received new tick during 2 sec in testing mode. The possible cause: user has stopped the tester manually in MetaTrader 5.");
             Deinit();
 
-            _stopTimer.Elapsed -= _stopTimer_Elapsed;
+            _stopTimer.Elapsed -= StopTimerElapsed;
             _stopTimer = null;
 
             Log.Debug("_stopTimer_Elapsed: end.");

@@ -1,9 +1,9 @@
 ﻿
-namespace MTApiService
+namespace MTAPIService
 {
-    public class MtConnectionProfile
+    public class MTConnectionProfile
     {
-        public MtConnectionProfile(string name)
+        public MTConnectionProfile(string name)
         {
             Name = name;
         }

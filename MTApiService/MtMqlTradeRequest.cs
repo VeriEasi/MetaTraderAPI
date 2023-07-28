@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace MTApiService
+namespace MTAPIService
 {
     [DataContract]
-    public class MtMqlTradeRequest
+    public class MTMQLTradeRequest
     {
         [DataMember]
         public int Action { get; set; }
@@ -19,19 +19,19 @@ namespace MTApiService
         [DataMember]
         public double Price { get; set; }
         [DataMember]
-        public double Stoplimit { get; set; }
+        public double StopLimit { get; set; }
         [DataMember]
-        public double Sl { get; set; }
+        public double SL { get; set; }
         [DataMember]
-        public double Tp { get; set; }
+        public double TP { get; set; }
         [DataMember]
         public ulong Deviation { get; set; }
         [DataMember]
         public int Type { get; set; }
         [DataMember]
-        public int Type_filling { get; set; }
+        public int TypeFilling { get; set; }
         [DataMember]
-        public int Type_time { get; set; }
+        public int TypeTime { get; set; }
         [DataMember]
         public DateTime Expiration { get; set; }
         [DataMember]

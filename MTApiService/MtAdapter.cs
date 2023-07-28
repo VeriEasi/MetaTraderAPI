@@ -2,32 +2,32 @@
 using System.Collections.Generic;
 using log4net;
 
-namespace MTApiService
+namespace MTAPIService
 {
-    public class MtAdapter
+    public class MTAdapter
     {
         #region Fields
-        private const string LogProfileName = "MtApiService";
+        private const string LogProfileName = "MTAPIService";
 
-        private static readonly ILog Log = LogManager.GetLogger(typeof(MtAdapter));
-        private static readonly MtAdapter Instance = new MtAdapter();
+        private static readonly ILog Log = LogManager.GetLogger(typeof(MTAdapter));
+        private static readonly MTAdapter Instance = new MTAdapter();
 
-        private readonly Dictionary<int, MtServer> _servers = new Dictionary<int, MtServer>();
-        private readonly Dictionary<int, MtExpert> _experts = new Dictionary<int, MtExpert>();
+        private readonly Dictionary<int, MTServer> _servers = new Dictionary<int, MTServer>();
+        private readonly Dictionary<int, MTExpert> _experts = new Dictionary<int, MTExpert>();
         #endregion
 
         #region Init Instance
 
-        private MtAdapter()
+        private MTAdapter()
         {
             LogConfigurator.Setup(LogProfileName);
         }
         
-        static MtAdapter() 
+        static MTAdapter() 
         {
         }
 
-        public static MtAdapter GetInstance()
+        public static MTAdapter GetInstance()
         {
             return Instance;
         }
@@ -36,14 +36,14 @@ namespace MTApiService
 
 
         #region Public Methods
-        public void AddExpert(int port, MtExpert expert)
+        public void AddExpert(int port, MTExpert expert)
         {
             if (expert == null)
                 throw new ArgumentNullException(nameof(expert));
 
             Log.InfoFormat("AddExpert: begin. expert = {0}", expert);
 
-            MtServer server;
+            MTServer server;
             lock (_servers)
             {
                 if (_servers.ContainsKey(port))
@@ -52,8 +52,8 @@ namespace MTApiService
                 }
                 else
                 {
-                    server = new MtServer(port);
-                    server.Stopped += server_Stopped;
+                    server = new MTServer(port);
+                    server.Stopped += ServerStopped;
                     _servers[port] = server;
 
                     server.Start();
@@ -75,7 +75,7 @@ namespace MTApiService
         {
             Log.InfoFormat("RemoveExpert: begin. expertHandle = {0}", expertHandle);
 
-            MtExpert expert = null;
+            MTExpert expert = null;
 
             lock (_experts)
             {
@@ -101,7 +101,7 @@ namespace MTApiService
         {
             Log.DebugFormat("UpdateQuote: begin. symbol = {0}, bid = {1}, ask = {2}", symbol, bid, ask);
 
-            MtExpert expert;
+            MTExpert expert;
             lock (_experts)
             {
                 expert = _experts[expertHandle];
@@ -109,7 +109,7 @@ namespace MTApiService
 
             if (expert != null)
             {
-                expert.UpdateQuote(new MtQuote { Instrument = symbol, Bid = bid, Ask = ask, ExpertHandle = expertHandle });
+                expert.UpdateQuote(new MTQuote { Instrument = symbol, Bid = bid, Ask = ask, ExpertHandle = expertHandle });
             }
             else
             {
@@ -123,7 +123,7 @@ namespace MTApiService
         {
             Log.DebugFormat("SendEvent: begin. eventType = {0}, payload = {1}", eventType, payload);
 
-            MtExpert expert;
+            MTExpert expert;
             lock (_experts)
             {
                 expert = _experts[expertHandle];
@@ -131,7 +131,7 @@ namespace MTApiService
 
             if (expert != null)
             {
-                expert.SendEvent(new MtEvent { EventType = eventType, Payload = payload, ExpertHandle = expertHandle });
+                expert.SendEvent(new MTEvent { EventType = eventType, Payload = payload, ExpertHandle = expertHandle });
             }
             else
             {
@@ -141,11 +141,11 @@ namespace MTApiService
             Log.Debug("SendEvent: end");
         }
 
-        public void SendResponse(int expertHandle, MtResponse response)
+        public void SendResponse(int expertHandle, MTResponse response)
         {
             Log.DebugFormat("SendResponse: begin. id = {0}, response = {1}", expertHandle, response);
 
-            MtExpert expert;
+            MTExpert expert;
             lock (_experts)
             {
                 expert = _experts[expertHandle];
@@ -167,7 +167,7 @@ namespace MTApiService
         {
             Log.DebugFormat("GetCommandType: begin. expertHandle = {0}", expertHandle);
 
-            MtExpert expert;
+            MTExpert expert;
             lock (_experts)
             {
                 expert = _experts[expertHandle];
@@ -189,7 +189,7 @@ namespace MTApiService
         {
             Log.DebugFormat("GetCommandParameter: begin. expertHandle = {0}, index = {1}", expertHandle, index);
 
-            MtExpert expert;
+            MTExpert expert;
             lock (_experts)
             {
                 expert = _experts[expertHandle];
@@ -211,7 +211,7 @@ namespace MTApiService
         {
             Log.DebugFormat("GetNamedParameter: begin. expertHandle = {0}, name = {1}", expertHandle, name);
 
-            MtExpert expert;
+            MTExpert expert;
             lock (_experts)
             {
                 expert = _experts[expertHandle];
@@ -233,7 +233,7 @@ namespace MTApiService
         {
             Log.DebugFormat("ContainsNamedParameter: begin. expertHandle = {0}, name = {1}", expertHandle, name);
 
-            MtExpert expert;
+            MTExpert expert;
             lock (_experts)
             {
                 expert = _experts[expertHandle];
@@ -244,7 +244,7 @@ namespace MTApiService
                 Log.WarnFormat("ContainsNamedParameter: expert with id {0} has not been found.", expertHandle);
             }
 
-            bool retval = expert != null ? expert.ContainsNamedParameter(name) : false;
+            bool retval = expert != null && expert.ContainsNamedParameter(name);
 
             Log.DebugFormat("ContainsNamedParameter: end. retval = {0}", retval);
 
@@ -258,14 +258,14 @@ namespace MTApiService
         #endregion
 
         #region Private Methods
-        private void server_Stopped(object sender, EventArgs e)
+        private void ServerStopped(object sender, EventArgs e)
         {
-            var server = (MtServer)sender;
-            server.Stopped -= server_Stopped;
+            var server = (MTServer)sender;
+            server.Stopped -= ServerStopped;
 
             var port = server.Port;
 
-            Log.InfoFormat("server_Stopped: port = {0}", port);
+            Log.InfoFormat("ServerStopped: port = {0}", port);
 
             lock (_servers)
             {
@@ -281,8 +281,7 @@ namespace MTApiService
         {
             Log.Debug("ExpertOnDeinited: begin.");
 
-            var expert = sender as MtExpert;
-            if (expert == null)
+            if (!(sender is MTExpert expert))
             {
                 Log.Warn("expert_Deinited: end. Expert is not defined.");
                 return;

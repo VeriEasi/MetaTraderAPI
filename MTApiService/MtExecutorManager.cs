@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using log4net;
 
-namespace MTApiService
+namespace MTAPIService
 {
-    internal class MtExecutorManager : ICommandManager
+    internal class MTExecutorManager : ICommandManager
     {
         #region Private Fields
-        private static readonly ILog Log = LogManager.GetLogger(typeof(MtExecutorManager));
+        private static readonly ILog Log = LogManager.GetLogger(typeof(MTExecutorManager));
 
         private readonly List<ITaskExecutor> _executorList = new List<ITaskExecutor>();
         private readonly Dictionary<int, ITaskExecutor> _executorMap = new Dictionary<int, ITaskExecutor>();
@@ -73,12 +73,12 @@ namespace MTApiService
             Log.Debug("RemoveExecutor: end.");
         }
 
-        public MtCommandTask SendCommand(MtCommand command)
+        public MTCommandTask SendCommand(MTCommand command)
         {
             if (command == null)
                 throw new ArgumentNullException(nameof(command));
 
-            var task = new MtCommandTask(command);
+            var task = new MTCommandTask(command);
 
             Log.DebugFormat("SendTask: begin. command = {0}", command);
 

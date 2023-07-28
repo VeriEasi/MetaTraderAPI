@@ -3,17 +3,17 @@ using System.Collections.Generic;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
 
-namespace MTApiService
+namespace MTAPIService
 {
-    internal class MtApiProxy : DuplexClientBase<IMtApi>, IMtApi, IDisposable
+    internal class MTAPIProxy : DuplexClientBase<IMTAPI>, IMTAPI, IDisposable
     {
-        public MtApiProxy(InstanceContext callbackContext, Binding binding, EndpointAddress remoteAddress)
+        public MTAPIProxy(InstanceContext callbackContext, Binding binding, EndpointAddress remoteAddress)
             : base(callbackContext, binding, remoteAddress)
         {
-            InnerDuplexChannel.Faulted += InnerDuplexChannel_Faulted;
+            InnerDuplexChannel.Faulted += InnerDuplexChannelFaulted;
         }
 
-        #region IMtApi Members
+        #region IMTAPI Members
 
         public bool Connect()
         {
@@ -26,12 +26,12 @@ namespace MTApiService
             Channel.Disconnect();
         }
 
-        public MtResponse SendCommand(MtCommand command)
+        public MTResponse SendCommand(MTCommand command)
         {
             return Channel.SendCommand(command);
         }
 
-        public List<MtQuote> GetQuotes()
+        public List<MTQuote> GetQuotes()
         {
             return Channel.GetQuotes();
         }
@@ -63,7 +63,7 @@ namespace MTApiService
         #endregion
 
         #region Private Methods
-        private void InnerDuplexChannel_Faulted(object sender, EventArgs e)
+        private void InnerDuplexChannelFaulted(object sender, EventArgs e)
         {
             Faulted?.Invoke(this, e);
         }

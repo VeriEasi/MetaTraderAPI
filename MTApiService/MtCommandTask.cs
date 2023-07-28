@@ -1,25 +1,22 @@
 ﻿using System;
 using System.Threading;
 
-namespace MTApiService
+namespace MTAPIService
 {
-    public class MtCommandTask
+    public class MTCommandTask
     {
         private readonly EventWaitHandle _responseWaiter = new AutoResetEvent(false);
-        private MtResponse _result;
+        private MTResponse _result;
         private readonly object _locker = new object();
 
-        public MtCommandTask(MtCommand command)
+        public MTCommandTask(MTCommand command)
         {
-            if (command == null)
-                throw new ArgumentNullException(nameof(command));
-
-            Command = command;
+            Command = command ?? throw new ArgumentNullException(nameof(command));
         }
 
-        public MtCommand Command { get; }
+        public MTCommand Command { get; }
 
-        public MtResponse WaitResult(int time)
+        public MTResponse WaitResult(int time)
         {
             _responseWaiter.WaitOne(time);
             lock (_locker)
@@ -28,7 +25,7 @@ namespace MTApiService
             }
         }
 
-        public void SetResult(MtResponse result)
+        public void SetResult(MTResponse result)
         {
             lock (_locker)
             {

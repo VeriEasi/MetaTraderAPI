@@ -4,21 +4,21 @@ using System.Runtime.Serialization;
 using System.Collections;
 using System.Globalization;
 
-namespace MTApiService
+namespace MTAPIService
 {
     [DataContract]
     [KnownType("GetKnownTypes")]
-    public abstract class MtResponse
+    public abstract class MTResponse
     {
         static IEnumerable<Type> GetKnownTypes()
         {
-            return new Type[] { typeof(MtResponseObject),
-                                typeof(MtResponseInt), typeof(MtResponseDouble),
-                                typeof(MtResponseString), typeof(MtResponseBool),
-                                typeof(MtResponseLong), typeof(MtResponseULong),
-                                typeof(MtResponseDoubleArray), typeof(MtResponseIntArray),
-                                typeof(MtResponseLongArray),
-                                typeof(MtResponseArrayList), typeof(MtResponseMqlRatesArray)};
+            return new Type[] { typeof(MTResponseObject),
+                                typeof(MTResponseInt), typeof(MTResponseDouble),
+                                typeof(MTResponseString), typeof(MTResponseBool),
+                                typeof(MTResponseLong), typeof(MTResponseULong),
+                                typeof(MTResponseDoubleArray), typeof(MTResponseIntArray),
+                                typeof(MTResponseLongArray),
+                                typeof(MTResponseArrayList), typeof(MTResponseMQLRatesArray)};
         }
 
         public abstract object GetValue();
@@ -28,9 +28,9 @@ namespace MTApiService
     }
 
     [DataContract]
-    public class MtResponseObject : MtResponse
+    public class MTResponseObject : MTResponse
     {
-        public MtResponseObject(object value)
+        public MTResponseObject(object value)
         {
             Value = value;
         }
@@ -47,9 +47,9 @@ namespace MTApiService
     }
 
     [DataContract]
-    public class MtResponseInt: MtResponse
+    public class MTResponseInt: MTResponse
     {
-        public MtResponseInt(int value)
+        public MTResponseInt(int value)
         {
             Value = value;
         }
@@ -66,9 +66,9 @@ namespace MTApiService
     }
 
     [DataContract]
-    public class MtResponseLong : MtResponse
+    public class MTResponseLong : MTResponse
     {
-        public MtResponseLong(long value)
+        public MTResponseLong(long value)
         {
             Value = value;
         }
@@ -85,9 +85,9 @@ namespace MTApiService
     }
 
     [DataContract]
-    public class MtResponseULong : MtResponse
+    public class MTResponseULong : MTResponse
     {
-        public MtResponseULong(ulong value)
+        public MTResponseULong(ulong value)
         {
             Value = value;
         }
@@ -104,9 +104,9 @@ namespace MTApiService
     }
 
     [DataContract]
-    public class MtResponseDouble : MtResponse
+    public class MTResponseDouble : MTResponse
     {
-        public MtResponseDouble(double value)
+        public MTResponseDouble(double value)
         {
             Value = value;
         }
@@ -123,9 +123,9 @@ namespace MTApiService
     }
 
     [DataContract]
-    public class MtResponseString : MtResponse
+    public class MTResponseString : MTResponse
     {
-        public MtResponseString(string value)
+        public MTResponseString(string value)
         {
             Value = value;
         }
@@ -142,9 +142,9 @@ namespace MTApiService
     }
 
     [DataContract]
-    public class MtResponseBool : MtResponse
+    public class MTResponseBool : MTResponse
     {
-        public MtResponseBool(bool value)
+        public MTResponseBool(bool value)
         {
             Value = value;
         }
@@ -161,9 +161,9 @@ namespace MTApiService
     }
 
     [DataContract]
-    public class MtResponseDoubleArray : MtResponse
+    public class MTResponseDoubleArray : MTResponse
     {
-        public MtResponseDoubleArray(double[] value)
+        public MTResponseDoubleArray(double[] value)
         {
             Value = value;
         }
@@ -180,9 +180,9 @@ namespace MTApiService
     }
 
     [DataContract]
-    public class MtResponseIntArray : MtResponse
+    public class MTResponseIntArray : MTResponse
     {
-        public MtResponseIntArray(int[] value)
+        public MTResponseIntArray(int[] value)
         {
             Value = value;
         }
@@ -199,9 +199,9 @@ namespace MTApiService
     }
 
     [DataContract]
-    public class MtResponseLongArray : MtResponse
+    public class MTResponseLongArray : MTResponse
     {
-        public MtResponseLongArray(long[] value)
+        public MTResponseLongArray(long[] value)
         {
             Value = value;
         }
@@ -218,9 +218,9 @@ namespace MTApiService
     }
 
     [DataContract]
-    public class MtResponseArrayList : MtResponse
+    public class MTResponseArrayList : MTResponse
     {
-        public MtResponseArrayList(ArrayList value)
+        public MTResponseArrayList(ArrayList value)
         {
             Value = value;
         }
@@ -237,15 +237,15 @@ namespace MTApiService
     }
 
     [DataContract]
-    public class MtResponseMqlRatesArray : MtResponse
+    public class MTResponseMQLRatesArray : MTResponse
     {
-        public MtResponseMqlRatesArray(MtMqlRates[] value)
+        public MTResponseMQLRatesArray(MTMQLRates[] value)
         {
             Value = value;
         }
 
         [DataMember]
-        public MtMqlRates[] Value { get; private set; }
+        public MTMQLRates[] Value { get; private set; }
 
         public override object GetValue() { return Value; }
 

@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <?define ProductName="MT5API" ?>
+
+    <?if $(var.Platform) = x64 ?>
+        <?define ProductPathNative="..\Build\Products\$(var.Configuration)\x64\"?>
+        <?define PlatformProgramFilesFolder = "ProgramFiles64Folder" ?>
+        <?define PlatformSystemFolder = "System64Folder" ?>    
+    <?else ?>
+        <?define ProductPathNative="..\Build\Products\$(var.Configuration)\"?>
+        <?define PlatformProgramFilesFolder = "ProgramFilesFolder" ?>
+        <?define PlatformSystemFolder = "SystemFolder" ?>
+    <?endif ?>
+
+    <?define ProductVersion=!(bind.FileVersion.MT5API.dll) ?>
+    <?define Manufacturer="DW"?>
+    <?define ProductPath="..\Build\Products\$(var.Configuration)\"?>
+    
+    <Product Id="*" 
+             Name="$(var.ProductName) $(var.ProductVersion)" 
+             Language="1033" 
+             Version="$(var.ProductVersion)" 
+             Manufacturer="$(var.Manufacturer)" 
+             UpgradeCode="d72d346e-e6f7-4c23-85c6-1c42b3175599">
+    <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
+    
+    <WixVariable Id="WixUILicenseRtf" Value="..\LICENSE.rtf" />
+
+    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+    <MediaTemplate EmbedCab="yes" />
+
+        <Feature Id="MT5API" Title="$(var.ProductName)" Level="1">
+            <ComponentGroupRef Id="MT5APIComponents"/>
+        </Feature>
+
+        <Feature Id="MT5Connector" Title="MT5 Connector" Level="1">
+            <ComponentGroupRef Id="MT5ConnectorComponents"/>
+        </Feature>
+
+        <Property Id="WIXUI_INSTALLDIR">INSTALLFOLDER</Property>
+        <UIRef Id="WixUI_Mondo" />
+    </Product>
+
+    <Fragment>
+        <Directory Id="TARGETDIR" Name="SourceDir">
+            <Directory Id="$(var.PlatformProgramFilesFolder)">
+                <Directory Id="INSTALLFOLDER" Name="$(var.ProductName)">
+
+                    <Directory Id="ExpertFolder" Name="Experts">
+                    </Directory>
+
+                    <Directory Id="GAC" Name="GAC">
+                    </Directory>
+
+                </Directory>
+            </Directory>
+
+            <Directory Id="$(var.PlatformSystemFolder)">
+            </Directory>
+
+            <Directory Id="ProgramMenuFolder">
+                <Directory Id="ApplicationProgramsFolder" Name="$(var.ProductName)">
+                </Directory>
+            </Directory>
+
+        </Directory>
+    </Fragment>
+
+    <Fragment>
+        <ComponentGroup Id="MT5APIComponents">
+
+            <Component Id="MT5APIDLL" Directory="INSTALLFOLDER">
+                <File Id="MT5API.dll" Name="MT5API.dll" KeyPath="yes"
+                    Source="$(var.ProductPath)MT5API.dll" />
+
+                <RegistryKey Root="HKLM"
+							 Key="Software\Microsoft\.NetFramework\v4.0.30319\AssemblyFoldersEx\$(var.ProductName)"
+							 ForceCreateOnInstall="yes"
+							 ForceDeleteOnUninstall="yes">
+					<RegistryValue Type="string" Value="[INSTALLFOLDER]"/>
+                </RegistryKey>
+            </Component>
+			
+            <Component Id="MTAPIServiceDLL" Directory="INSTALLFOLDER">
+                <File Id="GAC_MTAPIService.dll" Name="MTAPIService.dll" KeyPath="yes"
+                    Source="$(var.ProductPath)MTAPIService.dll"/>
+            </Component>
+
+			<Component Id="NewtonsoftJsondll" Directory="INSTALLFOLDER">
+				<File Id="Newtonsoft.Json.dll" Name="Newtonsoft.Json.dll" KeyPath="yes"
+                    Source="$(var.ProductPath)Newtonsoft.Json.dll"/>
+			</Component>
+
+            <Component Id="MT5APIExpert" Directory="ExpertFolder">
+                <File Id="MT5API.ex5" Name="MT5API.ex5" KeyPath="yes"
+                      Source="..\MQ5\MT5API.ex5" />
+            </Component>
+
+            <Component Id="AppShortcutConnMgr" Guid="*" Directory="ApplicationProgramsFolder">
+                <RemoveFolder Id="ApplicationProgramsFolder" On="uninstall"/>
+                <RegistryValue Root="HKCU" Key="Software\$(var.ProductName)" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
+            </Component>
+
+        </ComponentGroup>
+
+        <ComponentGroup Id="MT5ConnectorComponents">
+			
+			<Component Id="ConnectionProfileRegistryKey" Guid="*" Directory="INSTALLFOLDER">
+                <RegistryKey Root="HKCU"
+                             Key="Software\MtApi\ConnectionProfiles\Local"
+							 ForceCreateOnInstall="yes"
+							 ForceDeleteOnUninstall="yes">
+                    <RegistryValue Type="string" Name="Host" Value=""/>
+                    <RegistryValue Type="integer" Name="Port" Value="8222" KeyPath="yes"/>
+                </RegistryKey>
+            </Component>
+
+            <Component Id="MTAPIServiceDLLGAC" Guid="6CD24D64-7DA1-4015-A5B3-B17C2488998C" Directory="GAC">
+                <File Id="MTAPIService.dll" Name="MTAPIService.dll" KeyPath="yes"
+					  Source="$(var.ProductPath)MTAPIService.dll" Checksum="yes"
+					  Assembly=".net" AssemblyManifest="MTAPIService.dll" Vital="yes" />
+            </Component>
+
+            <Component Id="MT5ConnectorDLL" Directory="$(var.PlatformSystemFolder)">
+                <File Id="MT5Connector.dll" Name="MT5Connector.dll" KeyPath="yes"
+                      Source="$(var.ProductPathNative)MT5Connector.dll" />
+            </Component>
+
+        </ComponentGroup>
+    </Fragment>
+</Wix>

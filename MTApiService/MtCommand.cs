@@ -2,10 +2,10 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace MTApiService
+namespace MTAPIService
 {
     [DataContract]
-    public class MtCommand
+    public class MTCommand
     {
         [DataMember]
         public int CommandType { get; set; }

@@ -4,10 +4,10 @@ using System.ServiceModel;
 using System.Threading;
 using log4net;
 
-namespace MTApiService
+namespace MTAPIService
 {
-    [ServiceContract(CallbackContract = typeof(IMtApiCallback), SessionMode = SessionMode.Required)]
-    public interface IMtApi
+    [ServiceContract(CallbackContract = typeof(IMTAPICallback), SessionMode = SessionMode.Required)]
+    public interface IMTAPI
     {
         [OperationContract]
         bool Connect();
@@ -16,45 +16,42 @@ namespace MTApiService
         void Disconnect();
 
         [OperationContract]
-        MtResponse SendCommand(MtCommand command);
+        MTResponse SendCommand(MTCommand command);
 
         [OperationContract]
-        List<MtQuote> GetQuotes();
+        List<MTQuote> GetQuotes();
     }
 
     [ServiceContract]
-    public interface IMtApiCallback
+    public interface IMTAPICallback
     {
         [OperationContract(IsOneWay = true)]
-        void OnQuoteUpdate(MtQuote quote);
+        void OnQuoteUpdate(MTQuote quote);
 
         [OperationContract(IsOneWay = true)]
         void OnServerStopped();
 
         [OperationContract(IsOneWay = true)]
-        void OnQuoteAdded(MtQuote quote);
+        void OnQuoteAdded(MTQuote quote);
 
         [OperationContract(IsOneWay = true)]
-        void OnQuoteRemoved(MtQuote quote);
+        void OnQuoteRemoved(MTQuote quote);
 
         [OperationContract(IsOneWay = true)]
-        void OnMtEvent(MtEvent ntEvent);
+        void OnMtEvent(MTEvent ntEvent);
     }
 
     [ServiceBehavior(ConcurrencyMode = ConcurrencyMode.Multiple,
                     AutomaticSessionShutdown = true,
                     IncludeExceptionDetailInFaults = true,
                     InstanceContextMode = InstanceContextMode.Single)]
-    public sealed class MtService : IMtApi
+    public sealed class MTService : IMTAPI
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(MtService));
+        private static readonly ILog Log = LogManager.GetLogger(typeof(MTService));
 
-        public MtService(IMtApiServer serverCallback)
+        public MTService(IMTAPIServer serverCallback)
         {
-            if (serverCallback == null)
-                throw new ArgumentNullException(nameof(serverCallback));
-
-            _server = serverCallback;
+            _server = serverCallback ?? throw new ArgumentNullException(nameof(serverCallback));
         }
 
         #region IMtApi
@@ -62,7 +59,7 @@ namespace MTApiService
         {
             Log.Debug("Connect: begin");
 
-            var callback = OperationContext.Current.GetCallbackChannel<IMtApiCallback>();
+            var callback = OperationContext.Current.GetCallbackChannel<IMTAPICallback>();
 
             if (callback == null)
             {
@@ -102,7 +99,7 @@ namespace MTApiService
         {
             Log.Debug("Disconnect: begin");
 
-            var callback = OperationContext.Current.GetCallbackChannel<IMtApiCallback>();
+            var callback = OperationContext.Current.GetCallbackChannel<IMTAPICallback>();
 
             if (callback == null)
             {
@@ -131,14 +128,14 @@ namespace MTApiService
             Log.Debug("Disconnect: end.");
         }
 
-        public MtResponse SendCommand(MtCommand command)
+        public MTResponse SendCommand(MTCommand command)
         {
             Log.DebugFormat("SendCommand: called. command = {0}", command);
 
             return _server.SendCommand(command);
         }
 
-        public List<MtQuote> GetQuotes()
+        public List<MTQuote> GetQuotes()
         {
             Log.Debug("GetQuotes: called.");
 
@@ -156,7 +153,7 @@ namespace MTApiService
             Log.Debug("OnStopServer: end.");
         }
 
-        public void QuoteUpdate(MtQuote quote)
+        public void QuoteUpdate(MTQuote quote)
         {
             Log.DebugFormat("QuoteUpdate: begin. quote = {0}", quote);
 
@@ -165,7 +162,7 @@ namespace MTApiService
             Log.Debug("QuoteUpdate: end.");
         }
 
-        public void OnQuoteAdded(MtQuote quote)
+        public void OnQuoteAdded(MTQuote quote)
         {
             Log.DebugFormat("OnQuoteAdded: begin. quote = {0}", quote);
 
@@ -174,7 +171,7 @@ namespace MTApiService
             Log.Debug("OnQuoteAdded: end.");
         }
 
-        public void OnQuoteRemoved(MtQuote quote)
+        public void OnQuoteRemoved(MTQuote quote)
         {
             Log.DebugFormat("OnQuoteRemoved: begin. quote = {0}", quote);
 
@@ -183,7 +180,7 @@ namespace MTApiService
             Log.Debug("OnQuoteRemoved: end.");
         }
 
-        public void OnMtEvent(MtEvent e)
+        public void OnMtEvent(MTEvent e)
         {
             Log.DebugFormat("OnMtEvent: begin.quote = {0}", e);
 
@@ -195,7 +192,7 @@ namespace MTApiService
 
         #region Private Methods
 
-        private void ExecuteCallbackAction(Action<IMtApiCallback> action)
+        private void ExecuteCallbackAction(Action<IMTAPICallback> action)
         {
             Log.Debug("ExecuteCallbackAction: begin.");
 
@@ -203,7 +200,7 @@ namespace MTApiService
             {
                 _clientsLocker.AcquireReaderLock(2000);
 
-                List<IMtApiCallback> crashedClientCallbacks = null;
+                List<IMTAPICallback> crashedClientCallbacks = null;
 
                 try
                 {
@@ -218,7 +215,7 @@ namespace MTApiService
                             Log.ErrorFormat("ExecuteCallbackAction: Exception - {0}", ex.Message);
 
                             if (crashedClientCallbacks == null)
-                                crashedClientCallbacks = new List<IMtApiCallback>();
+                                crashedClientCallbacks = new List<IMTAPICallback>();
 
                             crashedClientCallbacks.Add(callback);
                         }
@@ -250,8 +247,8 @@ namespace MTApiService
         #endregion
 
         #region Fields
-        private readonly IMtApiServer _server;
-        private readonly List<IMtApiCallback> _clientCallbacks = new List<IMtApiCallback>();
+        private readonly IMTAPIServer _server;
+        private readonly List<IMTAPICallback> _clientCallbacks = new List<IMTAPICallback>();
         private readonly ReaderWriterLock _clientsLocker = new ReaderWriterLock();
         #endregion
     }

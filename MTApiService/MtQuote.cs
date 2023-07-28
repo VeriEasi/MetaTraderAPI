@@ -1,9 +1,9 @@
 ﻿using System.Runtime.Serialization;
 
-namespace MTApiService
+namespace MTAPIService
 {
     [DataContract]
-    public class MtQuote
+    public class MTQuote
     {
         [DataMember]
         public string Instrument { get; internal set; }

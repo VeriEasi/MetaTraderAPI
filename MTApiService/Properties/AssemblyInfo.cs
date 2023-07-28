@@ -1,15 +1,14 @@
 ﻿using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("MTApiService")]
+[assembly: AssemblyTitle("MTAPIService")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("DW")]
-[assembly: AssemblyProduct("MTApiService")]
+[assembly: AssemblyProduct("MTAPIService")]
 [assembly: AssemblyCopyright("Copyright © DW 2011")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

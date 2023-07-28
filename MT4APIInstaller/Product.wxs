@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <?define ProductName="MT4API" ?>
+
+	<?if $(var.Platform) = x64 ?>
+	    <?define ProductPathNative="..\Build\Products\$(var.Configuration)\x64\"?>
+	    <?define PlatformProgramFilesFolder = "ProgramFiles64Folder" ?>
+	    <?define PlatformSystemFolder = "System64Folder" ?>
+	<?else ?>
+	    <?define ProductPathNative="..\Build\Products\$(var.Configuration)\"?>
+	    <?define PlatformProgramFilesFolder = "ProgramFilesFolder" ?>
+	    <?define PlatformSystemFolder = "SystemFolder" ?>
+	<?endif ?>
+	
+    <?define ProductVersion=!(bind.FileVersion.MT4API.dll) ?>
+    <?define Manufacturer="DW"?>
+    <?define ProductPath="..\Build\Products\$(var.Configuration)\"?>
+  
+	<Product Id="*" 
+			 Name="$(var.ProductName) $(var.ProductVersion)" 
+			 Language="1033" 
+			 Version="$(var.ProductVersion)"
+			 Manufacturer="$(var.Manufacturer)"
+			 UpgradeCode="4107F5F4-7300-4B45-88CE-63929AF228FA">
+    <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
+
+    <WixVariable Id="WixUILicenseRtf" Value="..\LICENSE.rtf" />
+
+    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+    <MediaTemplate EmbedCab="yes" />
+
+        <Feature Id="MT4API" Title="$(var.ProductName)" Level="1">
+            <ComponentGroupRef Id="MT4APIComponents"/>
+        </Feature>
+
+        <Feature Id="MT4Connector" Title="MT4 Connector" Level="1">
+            <ComponentGroupRef Id="MT4ConnectorComponents"/>
+        </Feature>
+
+        <Property Id="WIXUI_INSTALLDIR">INSTALLFOLDER</Property>
+		<UIRef Id="WixUI_Mondo" />
+    </Product>
+
+    <Fragment>
+        <Directory Id="TARGETDIR" Name="SourceDir">
+			<Directory Id="ProgramFilesFolder">
+				<Directory Id="INSTALLFOLDER" Name="$(var.ProductName)">
+					
+					<Directory Id="ExpertFolder" Name="Experts">
+				    </Directory>
+					
+					<Directory Id="GAC" Name="GAC">
+					</Directory>
+				
+				</Directory>
+			</Directory>
+			
+			<Directory Id="SystemFolder">
+			</Directory>
+			
+			<Directory Id="ProgramMenuFolder">
+				<Directory Id="ApplicationProgramsFolder" Name="$(var.ProductName)">
+				</Directory>
+			</Directory>
+		
+		</Directory>
+	</Fragment>
+
+    <Fragment>
+        <ComponentGroup Id="MT4APIComponents">
+
+            <Component Id="MT4APIDLL" Directory="INSTALLFOLDER">
+                <File Id="MT4API.dll" Name="MT4API.dll" KeyPath="yes"
+                    Source="$(var.ProductPath)MT4API.dll" />
+
+                <RegistryKey Root="HKLM"
+							 Key="Software\Microsoft\.NetFramework\v4.0.30319\AssemblyFoldersEx\$(var.ProductName)"
+							 ForceCreateOnInstall="yes"
+							 ForceDeleteOnUninstall="yes">
+					<RegistryValue Type="string" Value="[INSTALLFOLDER]"/>
+                </RegistryKey>
+            </Component>
+
+            <Component Id="MTAPIServiceDLL" Directory="INSTALLFOLDER">
+                <File Id="GAC_MTAPIService.dll" Name="MTAPIService.dll" KeyPath="yes"
+                    Source="$(var.ProductPath)MTAPIService.dll"/>
+            </Component>
+
+            <Component Id="NewtonsoftJsondll" Directory="INSTALLFOLDER">
+                <File Id="Newtonsoft.Json.dll" Name="Newtonsoft.Json.dll" KeyPath="yes"
+                    Source="$(var.ProductPath)Newtonsoft.Json.dll"/>
+            </Component>
+          
+            <Component Id="MT4APIExpert" Directory="ExpertFolder">
+                <File Id="MT4API.ex4" Name="MT4API.ex4" KeyPath="yes"
+					  Source="..\MQ4\MT4API.ex4" />
+            </Component>
+
+            <Component Id="AppShortcutConnMgr" Guid="*" Directory="ApplicationProgramsFolder">
+                <RemoveFolder Id="ApplicationProgramsFolder" On="uninstall"/>
+                <RegistryValue Root="HKCU" Key="Software\$(var.ProductName)" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
+            </Component>
+
+        </ComponentGroup>
+
+        <ComponentGroup Id="MT4ConnectorComponents">
+			
+			<Component Id="ConnectionProfileRegistryKey" Guid="*" Directory="INSTALLFOLDER">
+				<RegistryKey Root="HKCU"
+							 Key="Software\MtApi\ConnectionProfiles\Local"
+							 ForceCreateOnInstall="yes"
+							 ForceDeleteOnUninstall="yes">
+					<RegistryValue Type="string" Name="Host" Value=""/>
+					<RegistryValue Type="integer" Name="Port" Value="8222" KeyPath="yes"/>
+				</RegistryKey>
+			</Component>
+			
+			<Component Id="MTAPIServiceDLLGAC" Guid="7285AE3C-D4A9-482A-BC7E-8F5B2A0FE97E" Directory="GAC">
+				<File Id="MTAPIService.dll" Name="MTAPIService.dll" KeyPath="yes"
+					  Source="$(var.ProductPath)MTAPIService.dll" Checksum="yes"
+					  Assembly=".net" AssemblyManifest="MTAPIService.dll" Vital="yes" />
+			</Component>
+			
+			<Component Id="MT4ConnectorDLL" Directory="SystemFolder">
+				<File Id="MT4Connector.dll" Name="MT4Connector.dll" KeyPath="yes"
+					  Source="$(var.ProductPathNative)MT4Connector.dll" />
+			</Component>
+
+        </ComponentGroup>
+	</Fragment>
+</Wix>

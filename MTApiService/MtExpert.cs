@@ -2,29 +2,29 @@
 using log4net;
 using System.Collections.Generic;
 
-namespace MTApiService
+namespace MTAPIService
 {
-    public class MtExpert: ITaskExecutor
+    public class MTExpert: ITaskExecutor
     {
-        public delegate void MtQuoteHandler(MtExpert expert, MtQuote quote);
-        public delegate void MtEventHandler(MtExpert expert, MtEvent e);
+        public delegate void MTQuoteHandler(MTExpert expert, MTQuote quote);
+        public delegate void MTEventHandler(MTExpert expert, MTEvent e);
 
         #region Private Fields
-        private static readonly ILog Log = LogManager.GetLogger(typeof(MtExpert));
+        private static readonly ILog Log = LogManager.GetLogger(typeof(MTExpert));
 
         private readonly IMetaTraderHandler _mtHadler;
-        private MtCommandTask _currentTask;
-        private readonly Queue<MtCommandTask> _taskQueue = new Queue<MtCommandTask>();
+        private MTCommandTask _currentTask;
+        private readonly Queue<MTCommandTask> _taskQueue = new Queue<MTCommandTask>();
         private readonly object _locker = new object();
         #endregion
 
         #region Public Methods
-        public MtExpert(int handle, string symbol, double bid, double ask, IMetaTraderHandler mtHandler)
+        public MTExpert(int handle, string symbol, double bid, double ask, IMetaTraderHandler mtHandler)
         {
             if (mtHandler == null)
                 throw new ArgumentNullException(nameof(mtHandler));
 
-            _quote = new MtQuote { ExpertHandle = handle, Instrument = symbol, Bid = bid, Ask =  ask};
+            _quote = new MTQuote { ExpertHandle = handle, Instrument = symbol, Bid = bid, Ask =  ask};
             Handle = handle;
             _mtHadler = mtHandler;
         }
@@ -38,7 +38,7 @@ namespace MTApiService
             Log.Debug("Deinit: end.");
         }
 
-        public void SendResponse(MtResponse response)
+        public void SendResponse(MTResponse response)
         {
             Log.DebugFormat("SendResponse: begin. response = {0}", response);
 
@@ -110,7 +110,7 @@ namespace MTApiService
             return command.NamedParams.ContainsKey(name);
         }
 
-        public virtual void SendEvent(MtEvent mtEvent)
+        public virtual void SendEvent(MTEvent mtEvent)
         {
             Log.DebugFormat("SendEvent: begin. event = {0}", mtEvent);
 
@@ -119,7 +119,7 @@ namespace MTApiService
             Log.Debug("SendEvent: end.");
         }
 
-        public void UpdateQuote(MtQuote quote)
+        public void UpdateQuote(MTQuote quote)
         {
             Log.DebugFormat("UpdateQuote: begin. quote = {0}", quote);
 
@@ -137,7 +137,7 @@ namespace MTApiService
 
         #region ITaskExecutor
 
-        public void Execute(MtCommandTask task)
+        public void Execute(MTCommandTask task)
         {
             lock (_taskQueue)
             {
@@ -151,8 +151,8 @@ namespace MTApiService
 
         #region Properties
 
-        private MtQuote _quote;
-        public MtQuote Quote
+        private MTQuote _quote;
+        public MTQuote Quote
         {
             get
             {
@@ -176,11 +176,11 @@ namespace MTApiService
         #endregion
 
         #region Private Methods
-        private MtCommandTask DequeueTask()
+        private MTCommandTask DequeueTask()
         {
             Log.Debug("DequeueTask: called.");
 
-            MtCommandTask task;
+            MTCommandTask task;
             int count;
 
             lock (_locker)
@@ -203,7 +203,7 @@ namespace MTApiService
             Log.Debug("NotifyCommandReady: end.");
         }
 
-        private void FireOnQuoteChanged(MtQuote quote)
+        private void FireOnQuoteChanged(MTQuote quote)
         {
             QuoteChanged?.Invoke(this, quote);
         }
@@ -213,7 +213,7 @@ namespace MTApiService
             Deinited?.Invoke(this, EventArgs.Empty);
         }
 
-        private void FireOnMtEvent(MtEvent mtEvent)
+        private void FireOnMtEvent(MTEvent mtEvent)
         {
             OnMtEvent?.Invoke(this, mtEvent);
         }
@@ -221,8 +221,8 @@ namespace MTApiService
 
         #region Events
         public event EventHandler Deinited;
-        public event MtQuoteHandler QuoteChanged;
-        public event MtEventHandler OnMtEvent;
+        public event MTQuoteHandler QuoteChanged;
+        public event MTEventHandler OnMtEvent;
         #endregion
     }
 }

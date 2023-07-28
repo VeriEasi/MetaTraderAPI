@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="..\packages\MSBuild.ILMerge.Task.1.0.5\build\MSBuild.ILMerge.Task.props" Condition="Exists('..\packages\MSBuild.ILMerge.Task.1.0.5\build\MSBuild.ILMerge.Task.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -9,9 +9,9 @@
     <ProjectGuid>{DE76D5C7-B99C-4467-8408-78173BDD84E0}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>MTApiService</RootNamespace>
-    <AssemblyName>MTApiService</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <RootNamespace>MTAPIService</RootNamespace>
+    <AssemblyName>MTAPIService</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
@@ -22,36 +22,39 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\build\products\Debug\</OutputPath>
+    <OutputPath>..\Build\Products\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\build\products\Release\</OutputPath>
+    <OutputPath>..\Build\Products\Release\</OutputPath>
     <DefineConstants>
     </DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>AnyCPU</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>MtApiKey.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>MTAPIKey.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="log4net, Version=1.2.15.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
-      <HintPath>..\packages\log4net.2.0.5\lib\net40-full\log4net.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="log4net, Version=2.0.15.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.2.0.15\lib\net45\log4net.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -63,34 +66,33 @@
     <Compile Include="IMetaTraderHandler.cs" />
     <Compile Include="ITaskExecutor.cs" />
     <Compile Include="LogConfigurator.cs" />
-    <Compile Include="Mt5Expert.cs" />
-    <Compile Include="MtCommandEventArgs.cs" />
+    <Compile Include="MT5Expert.cs" />
+    <Compile Include="MTCommandEventArgs.cs" />
     <Compile Include="IDisposableChannel.cs" />
-    <Compile Include="IMtApiServer.cs" />
-    <Compile Include="MtApiProxy.cs" />
-    <Compile Include="MtClient.cs" />
-    <Compile Include="MtCommandTask.cs" />
-    <Compile Include="MtEvent.cs" />
-    <Compile Include="MtMqlRates.cs" />
-    <Compile Include="MtMqlTradeRequest.cs" />
-    <Compile Include="MtRegistryManager.cs" />
-    <Compile Include="MtConnectionProfile.cs" />
-    <Compile Include="MtExecutorManager.cs" />
-    <Compile Include="MtExpert.cs" />
-    <Compile Include="MtQuote.cs" />
-    <Compile Include="MtResponse.cs" />
-    <Compile Include="MtServer.cs" />
-    <Compile Include="MtCommand.cs" />
-    <Compile Include="MtAdapter.cs" />
-    <Compile Include="MtService.cs" />
+    <Compile Include="IMTAPIServer.cs" />
+    <Compile Include="MTAPIProxy.cs" />
+    <Compile Include="MTClient.cs" />
+    <Compile Include="MTCommandTask.cs" />
+    <Compile Include="MTEvent.cs" />
+    <Compile Include="MTMQLRates.cs" />
+    <Compile Include="MTMQLTradeRequest.cs" />
+    <Compile Include="MTRegistryManager.cs" />
+    <Compile Include="MTConnectionProfile.cs" />
+    <Compile Include="MTExecutorManager.cs" />
+    <Compile Include="MTExpert.cs" />
+    <Compile Include="MTQuote.cs" />
+    <Compile Include="MTResponse.cs" />
+    <Compile Include="MTServer.cs" />
+    <Compile Include="MTCommand.cs" />
+    <Compile Include="MTAdapter.cs" />
+    <Compile Include="MTService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ILMerge.props">
       <SubType>Designer</SubType>
     </None>
-    <None Include="MtApiKey.snk" />
-    <None Include="packages.config" />
+    <None Include="MTAPIKey.snk" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="ILMergeOrder.txt" />

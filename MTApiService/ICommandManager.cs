@@ -1,7 +1,7 @@
-﻿namespace MTApiService
+﻿namespace MTAPIService
 {
     internal interface ICommandManager
     {
-        MtCommandTask SendCommand(MtCommand task);
+        MTCommandTask SendCommand(MTCommand task);
     }
 }
