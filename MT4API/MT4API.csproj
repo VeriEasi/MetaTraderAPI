@@ -141,12 +141,6 @@
     <Compile Include="MT4APITimeConverter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\MTAPIService\MTAPIService.csproj">
-      <Project>{DE76D5C7-B99C-4467-8408-78173BDD84E0}</Project>
-      <Name>MTAPIService</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>
