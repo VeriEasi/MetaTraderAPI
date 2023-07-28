@@ -157,4 +157,4 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 
 VeriEasi - verieasi2020@gmail.com
 
-Project Link: https://github.com/VeriEasi/MetaTraderAPINetCore.git
+Project Link: https://github.com/VeriEasi/MetaTraderAPI.git
