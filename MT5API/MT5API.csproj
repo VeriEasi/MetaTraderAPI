@@ -105,6 +105,12 @@
     <Compile Include="Requests\SymbolInfoStringResult.cs" />
     <Compile Include="Requests\SymbolInfoTickRequest.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MTAPIService\MTAPIService.csproj">
+      <Project>{de76d5c7-b99c-4467-8408-78173bdd84e0}</Project>
+      <Name>MTAPIService</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
